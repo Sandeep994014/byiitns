@@ -3,8 +3,9 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, FileText, Link as LinkIcon } from "lucide-react";
+import { ArrowLeft, FileText, Link as LinkIcon, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
 import testSeriesPdf from "@/assets/testSeries/TEST SERIES BROUCHER .pdf";
 
 interface Section {
@@ -28,6 +29,7 @@ const SectionDetail = () => {
   const [contents, setContents] = useState<SectionContent[]>([]);
   const [loading, setLoading] = useState(true);
   const pdfOpenedRef = useRef(false);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -66,16 +68,19 @@ const SectionDetail = () => {
     fetchData();
   }, [id, navigate]);
 
-  // Open PDF for Test Series section
+  // Open PDF for Test Series section (desktop only - mobile shows embedded version)
   useEffect(() => {
-    if (section && !loading && !pdfOpenedRef.current) {
+    if (section && !loading && !pdfOpenedRef.current && !isMobile) {
       const isTestSeries = section.title?.toLowerCase().trim() === "test series";
       if (isTestSeries) {
         pdfOpenedRef.current = true;
-        window.open(testSeriesPdf, "_blank", "noopener,noreferrer");
+        // Small delay to ensure page is rendered
+        setTimeout(() => {
+          window.open(testSeriesPdf, "_blank", "noopener,noreferrer");
+        }, 100);
       }
     }
-  }, [section, loading]);
+  }, [section, loading, isMobile]);
 
   if (loading) {
     return (
@@ -124,7 +129,32 @@ const SectionDetail = () => {
           <p className="text-lg text-foreground/70">{section.description}</p>
         </div>
 
-        {contents.length === 0 ? (
+        {section.title?.toLowerCase().trim() === "test series" ? (
+          <Card className="shadow-card border-4 border-primary/20 rounded-3xl">
+            <CardHeader>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <CardTitle className="text-primary">Test Series Brochure</CardTitle>
+                <Button
+                  onClick={() => window.open(testSeriesPdf, "_blank", "noopener,noreferrer")}
+                  className="bg-gradient-accent text-accent-foreground hover:opacity-90 rounded-full px-6 font-bold w-full sm:w-auto"
+                >
+                  Open in New Tab
+                  <ExternalLink className="ml-2 h-4 w-4" />
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="w-full" style={{ minHeight: isMobile ? "400px" : "600px" }}>
+                <iframe
+                  src={testSeriesPdf}
+                  className="w-full h-full min-h-[400px] md:min-h-[600px] rounded-lg border-2 border-primary/20"
+                  title="Test Series Brochure"
+                  style={{ height: isMobile ? "500px" : "700px" }}
+                />
+              </div>
+            </CardContent>
+          </Card>
+        ) : contents.length === 0 ? (
           <Card className="shadow-card border-4 border-primary/20 rounded-3xl">
             <CardHeader>
               <CardTitle className="text-primary">No Content Available</CardTitle>
