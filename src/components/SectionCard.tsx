@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import * as Icons from "lucide-react";
 import { LucideIcon } from "lucide-react";
 import testSeriesPdf from "@/assets/testSeries/TEST SERIES BROUCHER .pdf";
+import informationBrochurePdf from "@/assets/testSeries/INFORMATION  BROCHURE.pdf";
 
 interface SectionCardProps {
   id: string;
@@ -15,11 +16,24 @@ export const SectionCard = ({ id, title, description, icon }: SectionCardProps) 
   const Icon = (Icons[icon as keyof typeof Icons] || Icons.FileText) as LucideIcon;
   
   const isTestSeries = title?.toLowerCase().trim() === "test series";
+  const isInformationBrochure = title?.toLowerCase().trim() === "information brochure";
+  const isLocationCentre = title?.toLowerCase().trim() === "location & centre" || title?.toLowerCase().includes("location");
 
   const handleClick = (e: React.MouseEvent) => {
     if (isTestSeries) {
       e.preventDefault();
       window.open(testSeriesPdf, "_blank", "noopener,noreferrer");
+    }
+    if (isInformationBrochure) {
+      e.preventDefault();
+      window.open(informationBrochurePdf, "_blank", "noopener,noreferrer");
+    }
+    if (isLocationCentre) {
+      e.preventDefault();
+      const address = "41A/1, Kalu Sarai, New Delhi-110016";
+      const encodedAddress = encodeURIComponent(address);
+      const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}&travelmode=driving`;
+      window.open(googleMapsUrl, "_blank", "noopener,noreferrer");
     }
   };
 
@@ -41,7 +55,7 @@ export const SectionCard = ({ id, title, description, icon }: SectionCardProps) 
     </Card>
   );
 
-  if (isTestSeries) {
+  if (isTestSeries || isInformationBrochure || isLocationCentre) {
     return (
       <div onClick={handleClick} className="block group cursor-pointer">
         {cardContent}

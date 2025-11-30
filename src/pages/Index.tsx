@@ -106,15 +106,39 @@ const Index = () => {
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-12">
-          {sections.map((section) => (
-            <SectionCard
-              key={section.id}
-              id={section.id}
-              title={section.title}
-              description={section.description}
-              icon={section.icon}
-            />
-          ))}
+          {sections.map((section) => {
+            // Comment out all cards except testSeries and Location & Centre
+            const sectionTitle = section.title?.toLowerCase().trim();
+            if (sectionTitle === "test series" || sectionTitle === "location & centre" || sectionTitle?.includes("location")) {
+              return (
+                <SectionCard
+                  key={section.id}
+                  id={section.id}
+                  title={section.title}
+                  description={section.description}
+                  icon={section.icon}
+                />
+              );
+            }
+            // Commented out other cards
+            // return (
+            //   <SectionCard
+            //     key={section.id}
+            //     id={section.id}
+            //     title={section.title}
+            //     description={section.description}
+            //     icon={section.icon}
+            //   />
+            // );
+            return null;
+          })}
+          {/* New Information Brochure Card */}
+          <SectionCard
+            id="information-brochure"
+            title="Information Brochure"
+            description="View our information brochure"
+            icon="FileText"
+          />
         </div>
 
         <footer className="text-center text-sm text-foreground/60 mt-16 pb-8 space-y-4">
